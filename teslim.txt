@@ -1,0 +1,5 @@
+Öğrenci Adı Soyadı: Ela Coşkun
+Proje Adı: GDP vs Happiness: Türkiye ve Avrupa Paradoksu (2012-2025)
+
+Canlı Web Sitesi Adresi: (Netlify'dan alacağımız link buraya gelecek)
+GitHub Deposu Adresi: (GitHub adresiniz var ise buraya gelecek)

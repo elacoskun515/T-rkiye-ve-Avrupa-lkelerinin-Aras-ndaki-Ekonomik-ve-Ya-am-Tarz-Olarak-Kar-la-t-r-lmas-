@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GDP vs Happiness: Türkiye ve Avrupa Paradoksu</title>
+  <meta name="description" content="Türkiye zenginleşti, yaşam memnuniyeti aynı hızda artmadı. 2012-2025 scrollytelling analizi.">
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Kütüphaneler -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/scrollama"></script>
+
+  <!-- PROFESYONEL ÖZEL STİLLER -->
+  <style>
+    :root {
+      --bg-primary: #07090e;
+      --bg-secondary: #0f172a;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --accent-cyan: #38bdf8;
+      --accent-amber: #f59e0b;
+      --accent-purple: #818cf8;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-glow: rgba(56, 189, 248, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      background: var(--bg-primary); 
+      color: var(--text-main); 
+      line-height: 1.8; 
+      overflow-x: hidden; 
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(129, 140, 248, 0.05) 0%, transparent 40%);
+    }
+
+    /* HERO BÖLÜMÜ */
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(180deg, rgba(7,9,14,0.8) 0%, var(--bg-primary) 100%), 
+                  radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+      border-bottom: 1px solid var(--border-glow);
+    }
+    .hero h1 { 
+      font-size: 3.2rem; 
+      color: var(--text-main); 
+      margin-bottom: 1.2rem; 
+      font-weight: 700; 
+      max-width: 950px; 
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .hero h1 span { color: var(--accent-cyan); text-shadow: 0 0 30px rgba(56,189,248,0.3); }
+    .hero h2 { font-size: 1.25rem; color: var(--text-muted); font-weight: 400; max-width: 700px; }
+    .hero .meta { 
+      margin-top: 2.5rem; 
+      font-size: 0.9rem; 
+      color: var(--accent-cyan); 
+      background: rgba(56, 189, 248, 0.08); 
+      padding: 0.6rem 1.4rem; 
+      border-radius: 30px; 
+      border: 1px solid rgba(56, 189, 248, 0.2); 
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .scroll-cue { 
+      margin-top: 3.5rem; 
+      color: var(--text-muted); 
+      font-weight: 500; 
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      animation: bounce 2s infinite; 
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-8px); }
+      60% { transform: translateY(-4px); }
+    }
+
+    /* ORTAK BÖLÜMLER */
+    .context, .conclusion { 
+      max-width: 850px; 
+      margin: 6rem auto; 
+      padding: 3rem; 
+      background: var(--card-bg); 
+      border-radius: 24px; 
+      border: 1px solid rgba(255,255,255,0.06); 
+      backdrop-filter: blur(16px); 
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+      text-align: center; 
+    }
+    .context h3, .conclusion h3 { color: var(--accent-cyan); margin-bottom: 1.2rem; font-size: 1.8rem; font-weight: 600; }
+    .context p, .conclusion p { font-size: 1.1rem; color: #cbd5e1; }
+
+    /* SCROLLYTELLING ALANI */
+    #scrolly { position: relative; display: flex; padding: 4rem 2rem; max-width: 1350px; margin: 0 auto; gap: 3.5rem; }
+    article { flex: 1; max-width: 48%; }
+    
+    .step {
+      min-height: 85vh;
+      margin-bottom: 5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      opacity: 0.2;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 2.5rem;
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .step.is-active {
+      opacity: 1;
+      border-left: 5px solid var(--accent-cyan);
+      border-color: rgba(56, 189, 248, 0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(56, 189, 248, 0.1);
+      background: rgba(15, 23, 42, 0.95);
+    }
+    .step h3 { font-size: 1.4rem; color: var(--accent-cyan); margin-bottom: 1rem; font-weight: 600; }
+    .step p { font-size: 1.05rem; color: #cbd5e1; }
+
+    /* SABİT GRAFİK KUTUSU */
+    figure.sticky {
+      position: sticky;
+      top: 12vh;
+      flex: 1;
+      height: 70vh;
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 24px;
+      border: 1px solid var(--border-glow);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-container { position: relative; flex-grow: 1; width: 100%; height: 100%; }
+
+    /* MOBİL UYUM */
+    @media (max-width: 992px) {
+      #scrolly { flex-direction: column-reverse; padding: 1rem; }
+      article { max-width: 100%; }
+      figure.sticky { position: sticky; top: 1rem; height: 45vh; margin-bottom: 2rem; }
+      .hero h1 { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BÖLÜM 1: AÇILIŞ (HERO) -->
+  <header class="hero">
+    <h1>Türkiye <span>Zenginleşti</span>, Yaşam Memnuniyeti Aynı Hızda Artmadı</h1>
+    <h2>Türkiye ve Avrupa Ülkelerinde Kişi Başına GSYH ile Yaşam Memnuniyeti (2012–2025)</h2>
+    <div class="meta">Veri Hikayesi Projesi | Hazırlayan: Ela Coşkun</div>
+    <div class="scroll-cue">↓ Aşağı Kaydırarak Hikâyeyi Keşfedin</div>
+  </header>
+
+  <main>
+    <!-- BÖLÜM 2: BAĞLAM -->
+    <section class="context">
+      <h3>Proje Bağlamı</h3>
+      <p><strong>Temel Soru:</strong> Gelir arttıkça insanlar daha mı memnun?<br>
+      <strong>Veri Seti:</strong> GDP vs Happiness (2012-2025)<br>
+      <strong>Çalışma Sorusu:</strong> Türkiye ve Avrupa ülkelerinin ekonomik göstergeleri ile yaşam memnuniyeti arasındaki ilişki nedir?</p>
+    </section>
+
+    <!-- BÖLÜM 3: SCROLLYTELLING ADIMLARI (8 Adım) -->
+    <section id="scrolly">
+      <article>
+        <div class="step" data-step="1">
+          <h3>Adım 1: Gelir Artışı</h3>
+          <p>Türkiye'de kişi başına GSYH nadir düşüşlerle birlikte genel olarak yükselmektedir. Grafik üzerindeki eğilim, ekonomik büyümenin sürekliliğine işaret etmektedir.</p>
+        </div>
+        <div class="step" data-step="2">
+          <h3>Adım 2: Memnuniyetin Üç Dönemi</h3>
+          <p>Yaşam memnuniyeti 2016'ya kadar hafif artmış, 2022'ye kadar ciddi bir düşüş yaşamış, son dönemde ise toparlanma eğilimi göstermiştir.</p>
+        </div>
+        <div class="step" data-step="3">
+          <h3>Adım 3: Ekonomik ve Sosyal Ayrışma</h3>
+          <p>Gelir yükselirken memnuniyet aynı yönde ilerlememiştir. 2016 sonrasında gelir artmaya devam ederken yaşam memnuniyetindeki ters yönlü hareket net şekilde ayrışmaktadır.</p>
+        </div>
+        <div class="step" data-step="4">
+          <h3>Adım 4: 2025'te Gelir-Mutluluk İlişkisi</h3>
+          <p>2025 yılında daha yüksek GSYH otomatik olarak daha yüksek memnuniyet getirmemektedir. Ülkeler doğrusal bir çizgi izlememektedir.</p>
+        </div>
+        <div class="step" data-step="5">
+          <h3>Adım 5: Gelir Bantları Analizi</h3>
+          <p>Ülkelerin çoğu 40-60 bin dolar bandında yoğunlaşırken, 60-80 bin dolar bandındaki ülkelerde yaşam memnuniyetinin belirgin biçimde daha yüksek olduğu görülmektedir.</p>
+        </div>
+        <div class="step" data-step="6">
+          <h3>Adım 6: Türkiye vs Avrupa (Memnuniyet)</h3>
+          <p>Avrupa ülkeleri memnuniyet skorlarına göre sıralandığında, Türkiye'nin Avrupa medyanının altında kaldığı açıkça görülmektedir.</p>
+        </div>
+        <div class="step" data-step="7">
+          <h3>Adım 7: Türkiye vs Avrupa (Gelir)</h3>
+          <p>Her iki taraf da zamanla zenginleşmektedir; ancak Avrupa ülkelerinin kişi başına GSYH seviyesi Türkiye'ye kıyasla katbekat yüksek seyretmektedir.</p>
+        </div>
+        <div class="step" data-step="8">
+          <h3>Adım 8: Sürüven ve Memnuniyet Farkı</h3>
+          <p>Avrupa ülkelerindeki yaşam memnuniyeti standartları, incelenen tüm zaman serisi boyunca Türkiye'nin üzerindeki konumunu korumaktadır.</p>
+        </div>
+      </article>
+
+      <!-- SABİT GRAFİK ALANI -->
+      <figure class="sticky">
+        <div class="chart-container">
+          <canvas id="mainChart"></canvas>
+        </div>
+      </figure>
+    </section>
+
+    <!-- SONUÇ BÖLÜMÜ -->
+    <section class="conclusion">
+      <h3>Peki Ne Olmuş? Sonuç ve Değerlendirme</h3>
+      <p>Türkiye'de kişi başına GSYH genel olarak artış gösterse de yaşam memnuniyeti aynı paralellikte seyretmemiş; özellikle 2016-2022 arasında sert bir düşüş kaydetmiştir. Avrupa ile olan makas hem ekonomik hem de sosyal açıdan belirgindir.</p>
+      <p style="margin-top: 1.2rem; font-size: 0.95rem; color: var(--text-muted);"><strong>Sınırlılıklar:</strong> Çalışma anket verilerine dayanmaktadır; korelasyon nedensellik anlamına gelmez.</p>
+    </section>
+  </main>
+
+  <!-- JAVASCRIPT GÖRSELLEŞTİRME MOTORU (GRADIENT VE PROFESYONEL AYARLAR) -->
+  <script>
+    const canvas = document.getElementById('mainChart');
+    const ctx = canvas.getContext('2d');
+
+    // Şık gradyan arka plan oluşturucu
+    const cyanGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    cyanGradient.addColorStop(0, 'rgba(56, 189, 248, 0.4)');
+    cyanGradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+    const amberGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    amberGradient.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
+    amberGradient.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+
+    let chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['2012', '2014', '2016', '2018', '2020', '2022', '2024', '2025'],
+        datasets: [{
+          label: 'Kişi Başına GSYH (Türkiye)',
+          data: [9000, 9500, 10800, 9600, 8600, 10600, 13000, 14500],
+          borderColor: '#38bdf8',
+          backgroundColor: cyanGradient,
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#38bdf8',
+          pointRadius: 4,
+          pointHoverRadius: 7
+        }]
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        plugins: { 
+          legend: { labels: { color: '#f1f5f9', font: { family: 'Plus Jakarta Sans', size: 12 } } },
+          tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleFont: { family: 'Plus Jakarta Sans' }, bodyFont: { family: 'Plus Jakarta Sans' }, padding: 12, cornerRadius: 8 }
+        },
+        scales: {
+          x: { ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans' } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+          y: { ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans' } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+        }
+      }
+    });
+
+    function updateChart(step) {
+      if (step === '1') {
+        chart.config.type = 'line';
+        chart.data.datasets = [{
+          label: 'Kişi Başına GSYH, Türkiye ($)',
+          data: [9000, 9500, 10800, 9600, 8600, 10600, 13000, 14500],
+          borderColor: '#38bdf8',
+          backgroundColor: cyanGradient,
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#38bdf8',
+          pointRadius: 4
+        }];
+      } else if (step === '2') {
+        chart.config.type = 'line';
+        chart.data.datasets = [{
+          label: 'Yaşam Memnuniyeti, Türkiye (0-10)',
+          data: [5.6, 5.7, 6.1, 5.5, 4.8, 4.5, 5.2, 5.4],
+          borderColor: '#f59e0b',
+          backgroundColor: amberGradient,
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#f59e0b',
+          pointRadius: 4
+        }];
+      } else if (step === '3') {
+        chart.config.type = 'line';
+        chart.data.datasets = [
+          { label: 'GSYH (Ölçekli)', data: [9000, 10800, 8600, 14500], borderColor: '#38bdf8', borderWidth: 3, tension: 0.3 },
+          { label: 'Memnuniyet (Ölçekli)', data: [5.6, 6.1, 4.8, 5.4], borderColor: '#f59e0b', borderWidth: 3, tension: 0.3 }
+        ];
+      } else if (step === '4' || step === '5') {
+        chart.config.type = 'scatter';
+        chart.data.datasets = [{
+          label: '2025 Ülkeler Dağılımı',
+          data: [
+            { x: 14500, y: 5.4 }, { x: 48000, y: 6.8 }, { x: 55000, y: 7.1 }, { x: 68000, y: 7.8 }
+          ],
+          backgroundColor: '#38bdf8',
+          pointRadius: 9,
+          pointHoverRadius: 12
+        }];
+      } else if (step === '6') {
+        chart.config.type = 'bar';
+        chart.data.labels = ['Finlandiya', 'Almanya', 'Fransa', 'Türkiye'];
+        chart.data.datasets = [{
+          label: '2025 Yaşam Memnuniyeti',
+          data: [7.8, 6.9, 6.5, 5.4],
+          backgroundColor: ['#475569', '#475569', '#475569', '#38bdf8'],
+          borderRadius: 8
+        }];
+      } else if (step === '7' || step === '8') {
+        chart.config.type = 'line';
+        chart.data.datasets = [
+          { label: 'Avrupa (Medyan)', data: [32000, 35000, 38000, 45000], borderColor: '#f59e0b', borderWidth: 3, tension: 0.3 },
+          { label: 'Türkiye', data: [9000, 10800, 8600, 14500], borderColor: '#38bdf8', borderWidth: 3, tension: 0.3 }
+        ];
+      }
+      chart.update();
+    }
+
+    const scroller = scrollama();
+    scroller.setup({ step: '.step', offset: 0.5 }).onStepEnter(response => {
+      document.querySelectorAll('.step').exec = el => el.classList.remove('is-active');
+      document.querySelectorAll('.step').forEach(el => el.classList.remove('is-active'));
+      response.element.classList.add('is-active');
+      updateChart(response.element.dataset.step);
+    });
+  </script>
+</body>
+</html>
+
+
